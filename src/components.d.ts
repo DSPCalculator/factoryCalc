@@ -22,6 +22,8 @@ declare module '@vue/runtime-core' {
     EnReadme: typeof import('./components/EnReadme.md')['default']
     FormulaSelectionDialog: typeof import('./components/FormulaSelectionDialog/FormulaSelectionDialog.vue')['default']
     'IAntDesign:deleteFilled': typeof import('~icons/ant-design/delete-filled')['default']
+    IPhCloudMoonBold: typeof import('~icons/ph/cloud-moon-bold')['default']
+    IPhSunHorizonBold: typeof import('~icons/ph/sun-horizon-bold')['default']
     'IZondicons:arrowThickDown': typeof import('~icons/zondicons/arrow-thick-down')['default']
     'IZondicons:arrowThickUp': typeof import('~icons/zondicons/arrow-thick-up')['default']
     'IZondicons:arrowThinRight': typeof import('~icons/zondicons/arrow-thin-right')['default']

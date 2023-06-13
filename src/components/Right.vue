@@ -2,14 +2,20 @@
   <div :class="theme.compact ? 'container-right-show' : 'container-right-hide'">
     <div class="container-right overflow-y-auto">
       <div class="add-items min-h-20 max-h-95 overflow-y-auto">
-        <div class="sticky top-0 z-99 p-5">
+        <div class="sticky top-0 z-99 p-5 ml-10">
           选择目标物
-          <ElButton @click="openSelect"> 添加一个新产物</ElButton>
+          <ElButton @click="openSelect">添加一个新产物</ElButton>
           <ElButton v-show="Object.keys(productList).length > 0" @click="cloneSelect"> 清空产物列表</ElButton>
 
           <span v-if="devModel">
             {{ productList }}
           </span>
+          <el-tooltip :content="isDark ? t('change light') : t('change dark')" placement="top">
+            <button class="icon-btn mx-2 !outline-none" @click="toggleDark()">
+              <i-ph-cloud-moon-bold v-if="isDark" class="icon-footer" />
+              <i-ph-sun-horizon-bold v-else class="icon-footer" />
+            </button>
+          </el-tooltip>
         </div>
 
         <div v-show="productList" class=" ">

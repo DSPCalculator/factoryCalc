@@ -61,7 +61,7 @@ const props = defineProps({
   close: Function,
   clickSelect: Function,
   date: Array,
-  dateKey: String,
+  dateKey: Number,
   content: Element,
 });
 const close = () => {
