@@ -14,11 +14,15 @@ import VueI18n from '@intlify/vite-plugin-vue-i18n';
 import LinkAttributes from 'markdown-it-link-attributes';
 import { ConfigEnv } from 'vite';
 import { resolve } from 'path';
+import legacy from '@vitejs/plugin-legacy';
 
 const defaultClasses = 'prose prose-sm m-auto text-left';
 
 export default (env: ConfigEnv) => {
   return [
+    legacy({
+      targets: ['defaults', 'not IE 11']
+    }),
     vue({
       include: [/\.vue$/, /\.md$/],
     }),
