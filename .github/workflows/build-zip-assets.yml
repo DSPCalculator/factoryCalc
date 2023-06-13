@@ -1,0 +1,32 @@
+name: build-zip-assets
+on:
+  push:
+    tags: [ "v*.*.*" ]
+
+env:
+  VITE_API_BASEURL: "/api"
+  VITE_BASE: "./"
+  VITE_APP_TITLE: "戴森球计划量化计算器"
+  VITE_APP_DESCRIPTION: "A zero-config Vue3 template includes Vite3、Vue3 and TypeScript"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          npm run install
+          npm run build
+
+      - name: zip
+        run: |
+          zip -r dist.zip dist/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist.zip
