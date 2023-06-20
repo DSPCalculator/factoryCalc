@@ -214,7 +214,7 @@
         "name": "粒子宽带"
       },
       {
-        "key": "copper_ore",
+        "key": "cpu",
         "name": "处理器"
       },
       {
@@ -342,7 +342,7 @@
         "name": "暂无"
       },
       {
-        "key": "none",
+        "key": "accelerator_0",
         "name": "暂无"
       },
       {

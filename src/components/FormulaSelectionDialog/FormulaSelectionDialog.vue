@@ -45,15 +45,7 @@
 
 <script setup lang="ts">
 import useConfigStore from '@/store/config';
-import {
-  calculate,
-  get_item_recipe_choices,
-  set_item_recipe_choices,
-  change_recipe_of,
-  mineralize,
-  unMineralize,
-  get_one_item_recipe_choices,
-} from '@/utils/calculate';
+
 import DSP from '@/assets/data/DSP.json';
 const config = useConfigStore();
 const props = defineProps({
@@ -63,16 +55,18 @@ const props = defineProps({
   date: Array,
   dateKey: Number,
   content: Element,
+  changeRecipeOf: Function,
 });
 const close = () => {
-  console.log('1111关闭');
   if (props.close) {
     props.close();
   }
 };
 const changeRecipeOf = (key, index) => {
   console.log('key, index', key, index);
-  change_recipe_of(key, index);
+  if (props?.changeRecipeOf) {
+    props?.changeRecipeOf(key, index);
+  }
   config.changeConfig();
   if (props.close) {
     props.close();

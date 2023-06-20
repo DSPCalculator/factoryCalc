@@ -1,6 +1,6 @@
 <template>
   <div class="container-left">
-    <div class="title flex justify-between items-center">
+    <div class="title flex justify-between items-center" v-if="theme.compact">
       <span></span>
       <h1 v-if="theme.compact" class=" ">更多设置</h1>
 
@@ -447,6 +447,9 @@ const showFactoryConfig = ref(true);
 .nvmer {
   height: calc(100vh - 45px);
   min-width: 323px;
+}
+.nvmer h2 {
+  background-color: var(--bg-color);
 }
 .nvmer::-webkit-scrollbar {
   width: 5px;

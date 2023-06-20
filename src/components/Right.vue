@@ -1,30 +1,153 @@
 <template>
   <div :class="theme.compact ? 'container-right-show' : 'container-right-hide'">
     <div class="container-right overflow-y-auto">
-      <div class="add-items min-h-20 max-h-95 overflow-y-auto">
-        <div class="sticky top-0 z-99 p-5 ml-10">
-          选择目标物
-          <ElButton @click="openSelect">添加一个新产物</ElButton>
-          <ElButton v-show="Object.keys(productList).length > 0" @click="cloneSelect"> 清空产物列表</ElButton>
+      <div class="add-items min-h-20">
+        <div class="flex items-center justify-between h-10">
+          <div class="flex items-center">
+            <div v-if="!theme.compact" class="inline-block h-10 flex items-center justify-center">
+              <el-tooltip class="box-item" :show-after="300" :auto-close="3000">
+                <el-icon :size="18" class="mr-3 ml-5">
+                  <button class="icon-btn mx-2 !outline-none" @click="click()">
+                    <i-zondicons:indent-decrease v-if="theme.compact" class="icon-footer" />
+                    <i-zondicons:indent-increase v-else class="icon-footer -rotate-x-180" />
+                  </button>
+                </el-icon>
+              </el-tooltip>
+            </div>
 
-          <span v-if="devModel">
-            {{ productList }}
-          </span>
-          <el-tooltip :content="isDark ? t('change light') : t('change dark')" placement="top">
-            <button class="icon-btn mx-2 !outline-none" @click="toggleDark()">
-              <i-ph-cloud-moon-bold v-if="isDark" class="icon-footer" />
-              <i-ph-sun-horizon-bold v-else class="icon-footer" />
-            </button>
-          </el-tooltip>
+            <div class="inline-block ml-2">选择目标物</div>
+            <ElButton class="ml-2" @click="openSelect('productList')">添加一个新产物</ElButton>
+            <ElButton @click="openSelect('fixedProduction')">添加一条固定产线</ElButton>
+            <ElButton v-show="Object.keys(productList).length > 0" @click="cloneSelect"> 清空产物列表</ElButton>
+          </div>
+
+          <div class="">
+            <span>
+              {{ devModel ? productList : '' }}
+            </span>
+            <el-tooltip :content="isDark ? t('change light') : t('change dark')" placement="top">
+              <button class="icon-btn mx-2 !outline-none" @click="toggleDark()">
+                <i-ph-cloud-moon-bold v-if="isDark" class="icon-footer" />
+                <i-ph-sun-horizon-bold v-else class="icon-footer" />
+              </button>
+            </el-tooltip>
+          </div>
         </div>
 
         <div v-show="productList" class=" ">
+          <!--  目标产线内容 -->
+          <h2 class="pl-3">目标产线内容</h2>
           <div class="product flex items-center" v-for="key in Object.keys(productList)">
-            <el-button type="primary" :icon="Delete" @click="delProduct(key)" />
+            <el-button type="primary" :icon="Delete" @click="delProduct('product', key)" />
             <ProductImg :key="key" :imgKey="key" class="mx-4" />
             <div class="mx-4 w-35 text-center">{{ DSP[key].name }}</div>
             <el-input-number v-model="productList[key]" controls-position="right" :min="0" class="mx-4 h-8" />
             / 分钟
+          </div>
+        </div>
+
+        <div v-show="fixedProduction" class=" ">
+          <!--  固定产线内容 -->
+
+          <h2 class="pl-3">
+            固定产线内容
+            <el-tooltip content="固定产线可以以单个建筑的生产产量加入最终计算中" placement="top">
+              <i-zondicons:exclamation-outline class="w-3"></i-zondicons:exclamation-outline>
+            </el-tooltip>
+          </h2>
+
+          <div class="product flex items-center pl-5" v-for="target in fixedProduction">
+            <el-button type="primary" :icon="Delete" @click="delProduct('fixed', target.targetName)" />
+            <ProductImg :key="target.targetName" :imgKey="target.targetName" class="mx-4" />
+
+            <div class="mx-4 w-35 text-center">{{ DSP[target.targetName].name }}</div>
+            <div class="w-55">
+              <el-input-number
+                v-model="fixedProduction[target.targetName].targetSum"
+                controls-position="right"
+                :min="0"
+                class="mx-4 h-8"
+              />
+              / 个
+            </div>
+            <!-- 工厂选择 -->
+            <SelectFactory
+              :selectKey="target.targetName"
+              :selectList="
+                facilityLabel(
+                  recipeList.item_data[target.targetName],
+                  recipeList.item_recipe_choices[target.targetName],
+                )
+              "
+              :selectNum="target.architecture"
+              selectType="architecture"
+              :selectFn="changeFixedSpraying"
+            >
+            </SelectFactory>
+            <!--  固定产线配方选择 -->
+            <div v-for="(recipe, index) in recipeList.item_data[target.targetName]" :key="recipe">
+              <!-- 配方的第0 个, 啥也不是, 冗余数据 ,需要跳出 -->
+              <div
+                v-if="index != 0 && recipeList.item_recipe_choices[target.targetName] == index"
+                :class="{
+                  active: recipeList.item_recipe_choices[target.targetName] == index,
+                  'cursor-pointer': recipeList.item_data[target.targetName].length != 2,
+                }"
+                class="flex items-center m-2 w-85 pr-2 pl-2 rounded-lg bg-current"
+                @click="changeRecipeOf(target.targetName, index, recipeList, 'fixed')"
+              >
+                <div v-for="material in Object.keys(recipeList.recipe_lists[recipe].in)">
+                  <ProductImg
+                    :imgKey="material"
+                    class="inline-block mr-1"
+                    :width="35"
+                    :num="recipeList.recipe_lists[recipe].in[material]"
+                  />
+                </div>
+
+                <div v-if="Object.keys(recipeList.recipe_lists[recipe].in).length > 0" class="text-cool-gray-50">
+                  <i-zondicons:arrow-thin-right> </i-zondicons:arrow-thin-right>
+                </div>
+                <div v-for="product in Object.keys(recipeList.recipe_lists[recipe].out)">
+                  <ProductImg
+                    :imgKey="product"
+                    class="inline-block mr-1"
+                    :width="35"
+                    :num="recipeList.recipe_lists[recipe].out[product]"
+                  />
+                </div>
+                <span class="text-cool-gray-50" style="transform: scale(0.8)"
+                  >({{ recipeList.recipe_lists[recipe].time }}s)
+                  {{ recipeList.item_data[target.targetName].length == 2 ? '' : ' 点击选择配方' }}
+                </span>
+              </div>
+            </div>
+            <!-- 增产剂模式选择 -->
+            <div class="production-model flex">
+              <div
+                v-for="option in config.miningIncOptions[
+                  get_item_recipe_choices(target.targetName)['additional_mode_index']
+                ]"
+                class="ml-2 bg-current cursor-pointer miningInc rounded-lg"
+                :class="{ active: target.additional_mode == option.key }"
+                :key="option"
+                @click="changeFixedSpraying(target.targetName, 'additional_mode', option.key)"
+              >
+                <span class="text-cool-gray-50"> {{ option.name }}</span>
+              </div>
+            </div>
+            <!-- 增产剂等级-->
+
+            <div v-if="target.additional_mode != 0">
+              <SelectFactory
+                :selectKey="target.targetName"
+                :selectList="config.miningSprayingOptions"
+                :selectNum="target.additional_level"
+                selectType="additional_level"
+                :selectFn="changeFixedSpraying"
+              >
+              </SelectFactory>
+            </div>
           </div>
         </div>
         <div v-if="Object.keys(recipeList.mineralize_list).length > 0">
@@ -36,7 +159,12 @@
           </div>
         </div>
       </div>
-      <DSPElDialog :visible="dialogFormVisible" :close="closeProduct" :clickSelect="selectProduct"></DSPElDialog>
+      <DSPElDialog
+        :title="dialogTitle"
+        :visible="dialogFormVisible"
+        :close="closeProduct"
+        :clickSelect="selectProduct"
+      ></DSPElDialog>
       <!-- 配方详情列表内容 -->
       <div>
         <div class="lists min-h-35">
@@ -94,7 +222,7 @@
                     'cursor-pointer': recipeList.item_data[result.key].length != 2,
                   }"
                   class="flex items-center m-2 w-85 pr-2 pl-2 rounded-lg bg-current"
-                  @click="changeRecipeOf(result.key, index, recipeList, result.key)"
+                  @click="changeRecipeOf(result.key, index, recipeList, 'goal')"
                 >
                   <div v-for="material in Object.keys(recipeList.recipe_lists[recipe].in)">
                     <ProductImg
@@ -134,7 +262,7 @@
                 )"
                 @click="changeRecipeRecipeChoices(result.key, 'architecture', index)"
               >
-                <ProductImg width="35" :imgKey="facility.名称" class="inline-block" />
+                <ProductImg width="35" :imgKey="facility.name" class="inline-block" />
               </div>
             </div>
             <!-- 选择增产剂模式 -->
@@ -155,34 +283,33 @@
               class="production flex"
               v-if="!result.factoriesNum.is_mineralized && get_item_recipe_choices(result.key)['additional_mode'] != 0"
             >
-              {{ get_item_recipe_choices(result.key)['additional_level'] }}
-              <div
-                v-for="(sprayingOption, index) in config.miningSprayingOptions"
-                key="sprayingOption.name"
-                class="ml-2 bg-current cursor-pointer miningInc rounded-lg"
-                @click="changeRecipeRecipeChoices(result.key, 'additional_level', sprayingOption.key)"
-                :class="{ active: get_item_recipe_choices(result.key)['additional_level'] == sprayingOption.key }"
+              <SelectFactory
+                :selectKey="result.key"
+                :selectList="config.miningSprayingOptions"
+                :selectNum="get_item_recipe_choices(result.key)['additional_level']"
+                selectType="additional_level"
+                :selectFn="changeRecipeRecipeChoices"
               >
-                <!-- get_item_recipe_choices(result.key) -->
-                <!-- <div v-if="sprayingOption.key == 0"> -->
-                <!-- {{ sprayingOption.name }}-->
-                <!-- 不使用 -->
-                <!-- </div v-else> -->
-                <div v-if="sprayingOption.key != 0">
-                  <ProductImg width="35" :imgKey="sprayingOption.name" class="inline-block" />
-                </div>
-              </div>
+              </SelectFactory>
             </div>
 
             <div v-if="0 != Number(result.factoriesNum)"></div>
           </div>
         </div>
       </div>
-
+      <div class="pb-5 pl-20">
+        <h2>冗余产物</h2>
+        <template v-if="Object.keys(recipeList.lp_surplus_list).length > 0">
+          <div v-for="building in Object.keys(recipeList.lp_surplus_list)" class="flex items-center">
+            <ProductImg width="35" :imgKey="building" class="inline-block" />
+            {{ DSP[building].name }} --- {{ recipeList.lp_surplus_list[building] }} 个
+          </div>
+        </template>
+      </div>
       <div class="h-[calc(100%-50rem)] pb-5 pl-20">
         <template v-if="Object.keys(recipeList.building_list).length > 0">
           <div>总计需要的建筑:</div>
-          <div v-for="building in Object.keys(recipeList.building_list)">
+          <div v-for="building in Object.keys(recipeList.building_list)" class="flex items-center">
             <ProductImg width="35" :imgKey="building" class="inline-block" />
             {{ DSP[building].name }} --- {{ recipeList.building_list[building] }} 个
           </div>
@@ -193,6 +320,7 @@
             >
           </div>
         </template>
+
         <EnReadme class=""></EnReadme>
       </div>
     </div>
@@ -201,7 +329,7 @@
       :close="closeformuldialog"
       :date="FormulaDialogDate"
       :dateKey="FormulaDialogDateKey"
-      :changeRecipeOf="changeRecipeOf"
+      :changeRecipeOf="tagRecipeType === 'goal' ? change_recipe_of : fixed_change_recipe_of"
     ></FormulaSelectionDialog>
   </div>
 </template>
@@ -221,6 +349,7 @@ import {
   mineralize,
   unMineralize,
   get_one_item_recipe_choices,
+  update_fixed_recipe,
 } from '@/utils/calculate';
 const theme = useCounterStore();
 const config = useConfigStore();
@@ -249,35 +378,110 @@ const del_mine = (key) => {
   unMineralize(key);
   config.changeConfig();
 };
-const openSelect = () => {
+const fixed_change_recipe_of = (key, index) => {
+  console.log('fixedProduction', key, index);
+  fixedProduction.value[key]['recipe_id'] = index;
+  change_recipe_of(key, index);
+};
+const openSelect = (key: string) => {
   console.log('dialogFormVisible', dialogFormVisible.value);
   dialogFormVisible.value = !dialogFormVisible.value;
-};
-const selectProduct = (selectItem) => {
-  if (selectItem.key in productList.value) {
-    productList.value[selectItem.key] += selectItem.num;
+  if (key == 'productList') {
+    dialogTitle.value = '选择目标产物';
   } else {
-    productList.value[selectItem.key] = selectItem.num;
+    dialogTitle.value = '选择固定产线';
+  }
+};
+
+const selectProduct = (selectItem: { key: string; num: number }) => {
+  console.log('selectItem', selectItem);
+  if (dialogTitle.value == '选择目标产物') {
+    if (selectItem.key in productList.value) {
+      productList.value[selectItem.key] += selectItem.num;
+    } else {
+      productList.value[selectItem.key] = selectItem.num;
+    }
+  } else {
+    // 固定产物添加
+    if (selectItem.key in fixedProduction.value) {
+      fixedProduction.value[selectItem.key].targetSum += selectItem.num;
+    } else {
+      fixedProduction.value[selectItem.key] = {
+        targetName: selectItem.key,
+        targetSum: selectItem.num,
+        recipe_id: 1,
+        additional_level: 0,
+        additional_mode: 0,
+        architecture: 0,
+      };
+    }
+    update_fixed_recipe(fixedProduction.value);
+    config.changeConfig();
   }
 
   dialogFormVisible.value = false;
 };
+
 const closeProduct = () => {
   calculate();
   dialogFormVisible.value = false;
 };
 // 当前选中的目标产物列表
 const productList = ref({});
+//固定产线选择
+const fixedProduction = ref({});
+
+// 修改生产模式模式
+const changeFixedSpraying = (key, type, index) => {
+  if (type === 'additional_mode') {
+    if (fixedProduction.value[key][type] === index) {
+      fixedProduction.value[key][type] = 0;
+    } else {
+      fixedProduction.value[key][type] = index;
+    }
+  } else {
+    if (fixedProduction.value[key]) {
+      fixedProduction.value[key][type] = index;
+    }
+  }
+};
+// 修改生产模式模式
+const fexchangeFixedSpraying = (key, type, index) => {
+  console.log(key, type, index);
+  get_item_recipe_choices(key, type, index);
+  config.changeConfig();
+};
+const dialogTitle = ref('选择目标产物');
+const tagRecipeType = ref('goal');
 const obj = ref(false);
 //点击删除产物
-const delProduct = (key: string) => {
-  if (productList.value[key]) {
-    delete productList.value[key];
+const delProduct = (type: string, key: string) => {
+  if (type == 'fixed') {
+    // 固定产物
+    if (fixedProduction.value[key]) {
+      // del_fixed_recipe(key);
+      delete fixedProduction.value[key];
+      config.changeConfig();
+    }
+  } else {
+    if (productList.value[key]) {
+      delete productList.value[key];
+    }
   }
 };
 const cloneSelect = () => {
   productList.value = {};
+  fixedProduction.value = {};
 };
+watch(fixedProduction, async (newQuestion, oldQuestion) => {
+  config.changeConfig();
+});
+//工厂修改器
+const changeFactory = () => {
+  console.log('1111');
+};
+
+// 在list 找到相应的数据
 const facilityLabel = (list, key) => {
   return game_data['factory_data'][recipeList.value.recipe_lists[list[key]]['facility']];
 };
@@ -293,20 +497,19 @@ const recipeList = computed(() => {
   return data;
 });
 
-const changeRecipeOf = (key, index, array, arrayKey) => {
-  if (array.item_data[arrayKey].length != 2) {
+const changeRecipeOf = (key, index, array, type) => {
+  if (array.item_data[key].length != 2) {
     visibleFormulaDialog.value = true;
     FormulaDialogDate.value = array;
-    FormulaDialogDateKey.value = arrayKey;
+    FormulaDialogDateKey.value = key;
+    tagRecipeType.value = type;
   } else {
     ElMessage({
       message: '此产物没有配方选择',
       type: 'warning',
     });
   }
-  // change_recipe_of(key, index);
-
-  // config.changeConfig();
+  config.changeConfig();
 };
 const closeformuldialog = () => {
   visibleFormulaDialog.value = false;
@@ -316,7 +519,6 @@ const closeformuldialog = () => {
 const changeRecipeRecipeChoices = (key, type, index) => {
   // 修改增产剂等级
   if (get_one_item_recipe_choices(key, type) === index) {
-    console.log(key, type, index);
     set_item_recipe_choices(key, type, 0);
   } else {
     set_item_recipe_choices(key, type, index);
@@ -335,7 +537,6 @@ const change_energy = () => {
   config.changeConfig();
 };
 </script>
-
 <style lang="scss">
 .container-right-show {
   padding-left: 420px;
@@ -390,7 +591,7 @@ const change_energy = () => {
 }
 
 .product:nth-last-child(1) {
-  border: none;
+  // border: none;
 }
 .active {
   background-color: #42586c;
@@ -408,7 +609,7 @@ const change_energy = () => {
   flex-direction: column;
 }
 .plant {
-  width: 6%;
+  width: 7%;
 }
 .list-content .plant {
   /* justify-content: space-evenly; */

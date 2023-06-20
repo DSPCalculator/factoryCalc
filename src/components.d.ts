@@ -27,6 +27,7 @@ declare module '@vue/runtime-core' {
     'IZondicons:arrowThickDown': typeof import('~icons/zondicons/arrow-thick-down')['default']
     'IZondicons:arrowThickUp': typeof import('~icons/zondicons/arrow-thick-up')['default']
     'IZondicons:arrowThinRight': typeof import('~icons/zondicons/arrow-thin-right')['default']
+    'IZondicons:exclamationOutline': typeof import('~icons/zondicons/exclamation-outline')['default']
     'IZondicons:indentDecrease': typeof import('~icons/zondicons/indent-decrease')['default']
     'IZondicons:indentIncrease': typeof import('~icons/zondicons/indent-increase')['default']
     Left: typeof import('./components/Left.vue')['default']
@@ -34,6 +35,7 @@ declare module '@vue/runtime-core' {
     Right: typeof import('./components/Right.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectFactory: typeof import('./components/SelectFactory/SelectFactory.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     ZhProcess: typeof import('./components/ZhProcess.md')['default']
   }
