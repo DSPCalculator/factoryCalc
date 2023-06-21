@@ -2,6 +2,7 @@ name: build-zip-assets
 on:
   push:
     tags: [ "v*.*.*" ]
+    branches: [add-gh-pages]
 
 env:
   VITE_API_BASEURL: "/api"
@@ -11,6 +12,12 @@ env:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -23,6 +30,16 @@ jobs:
         run: |
           npm install --force
           npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
 
       - name: zip
         run: |
