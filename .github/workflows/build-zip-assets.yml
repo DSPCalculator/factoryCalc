@@ -2,7 +2,6 @@ name: build-zip-assets
 on:
   push:
     tags: [ "v*.*.*" ]
-    branches: [fix-and-upgrade-ci]
 
 env:
   VITE_API_BASEURL: "/api"
