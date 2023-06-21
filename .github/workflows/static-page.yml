@@ -1,7 +1,7 @@
 name: static-page
 on:
   push:
-    branches: [add-gh-pages]
+    branches: [gh-pages]
 
 env:
   VITE_API_BASEURL: "/api"
