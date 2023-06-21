@@ -32,7 +32,7 @@ var item_data = get_item_data();
 
       proliferator_data：增产剂效果字典
           记录增产剂效能的数组，数组中第i个元素即为第i级增产剂的数据，以字典形式存储，其中各个键值对的意义为：
-              增产剂名称：增产剂在游戏中的名字，其中，0级增产剂名为“不使用增产剂
+              增产剂name：增产剂在游戏中的名字，其中，0级增产剂名为“不使用增产剂
               additional_effect：使用此增产剂在额外产出模式时的output-ratio，如3级增产剂的additional_effect为1.25
               speedup：使用此增产剂在生产加速模式时的output-ratio，如3级增产剂的speedup为2
               power-ratio：使用此增产剂时工厂的power-ratio，如3级增产剂的power-ratio为2.5
@@ -207,7 +207,7 @@ const scheme_data = {
   }
 
   function addNaturalProductionLine() {
-    // natural_production_line.push({ "目标物品": "氢", "建筑数量": 0, "recipe_id": 1, "additional_level": 0, "additional_mode": 0, "architecture": 0 })
+    // natural_production_line.push({ "targetName": "氢", "targetSum": 0, "recipe_id": 1, "additional_level": 0, "additional_mode": 0, "architecture": 0 })
     show_natural_production_line();
   }
 
@@ -223,7 +223,7 @@ const scheme_data = {
     natural_production_line[i]["architecture"] = document.getElementById("factory_of_natural_production_" + i).value;
     natural_production_line[i]["additional_mode"] = document.getElementById("pro_mode_of_natural_production_" + i).value;
     natural_production_line[i]["additional_level"] = document.getElementById("pro_num_of_natural_production_" + i).value;
-    natural_production_line[i]["建筑数量"] = document.getElementById("building_num_of_natural_production_" + i).value;
+    natural_production_line[i]["targetSum"] = document.getElementById("building_num_of_natural_production_" + i).value;
     show_natural_production_line();
 
   }
@@ -243,7 +243,7 @@ const scheme_data = {
       alert("请输入或选择正确的物品名字！");
     }
     else {
-      natural_production_line[i]["目标物品"] = item;
+      natural_production_line[i]["targetName"] = item;
     }
     natural_production_line[i]["recipe_id"] = 1;
     natural_production_line[i]["architecture"] = 0;
@@ -291,8 +291,8 @@ const scheme_data = {
     //   var str = "";
     //   for (var i in natural_production_line) {
     //     str += "<tr id=\"natural_production_" + i + "\">" +
-    //       "<th><input list=\"item_list\" id=\"item_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["目标物品"] + "\" onChange=\"NPChangeItem('" + i + "')\"></th>" + // 目标物品
-    //       "<th><input id=\"building_num_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["建筑数量"] + "\" onChange=\"NPChangeSchemeOf('" + i + "')\">" + "</th>" +  //建筑数量
+    //       "<th><input list=\"item_list\" id=\"item_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["targetName"] + "\" onChange=\"NPChangeItem('" + i + "')\"></th>" + // targetName
+    //       "<th><input id=\"building_num_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["targetSum"] + "\" onChange=\"NPChangeSchemeOf('" + i + "')\">" + "</th>" +  //targetSum
     //       "<th><select id=\"recipe_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["配方id"] + "\" onChange=\"NPc('" + i + "')\"></th>" + // 所选配方
     //       "<th><select id=\"pro_num_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["additional_level"] + "\" onChange=\"NPChangeSchemeOf('" + i + "')\"></select></th>" + //所选增产剂
     //       "<th><select id=\"pro_mode_of_natural_production_" + i + "\" value=\"" + natural_production_line[i]["additional_mode"] + "\" onChange=\"NPChangeSchemeOf('" + i + "')\"></select></th>" + //所选additional_mode
@@ -362,7 +362,7 @@ const scheme_data = {
         if (game_data.factory_data[factory].length >= 2) {
           str += factory + ":<select id=\"batch_setting_" + factory + "\" onChange=\"BatchChangeFactoryOf('" + factory + "')\">";
           for (var i = 0; i < game_data.factory_data[factory].length; i++) {
-            str += "<option value=\"" + i + "\" label=\"" + game_data.factory_data[factory][i]["名称"] + "\"";
+            str += "<option value=\"" + i + "\" label=\"" + game_data.factory_data[factory][i]["name"] + "\"";
             if (i == 0) {
               str += " selected"
             }
@@ -430,7 +430,7 @@ const scheme_data = {
         str += "<datalist id=\"" + factory + "_list\">";
         for (var building in game_data["factory_data"][factory]) {
           str += "<option value=\"" + building +
-            "\" label=\"" + game_data["factory_data"][factory][building]["名称"] + "\">";
+            "\" label=\"" + game_data["factory_data"][factory][building]["name"] + "\">";
         }
         str += "</datalist>\n";
       }
@@ -466,7 +466,7 @@ const scheme_data = {
   //   var str = "";
   //   for (var i in lp_surplus_list) {
   //     str +=
-  //       "<tr><th>" + i + "</th>" +  //目标物品
+  //       "<tr><th>" + i + "</th>" +  //targetName
   //       "<th>" + lp_surplus_list[i] + "</th></tr>"; //分钟冗余
   //   }
   //   // document.getElementById("surplus_list").innerHTML = str;
@@ -478,7 +478,7 @@ const scheme_data = {
 
 {//初始化以及主要逻辑
   var needs_list = {};//物品需求列表
-  var natural_production_line = [];//固有产线的输入输出影响,格式为[0号产线{"目标物品","建筑数量","配方id","additional_level","additional_mode","architecture"},...]
+  var natural_production_line = [];//固有产线的输入输出影响,格式为[0号产线{"targetName","targetSum","配方id","additional_level","additional_mode","architecture"},...]
   var mineralize_list = {};//原矿化列表，代表忽视哪些物品的原料
   var stackable_buildings = { "研究站": 15 };
 
@@ -537,10 +537,14 @@ export const calculate = (needs_list) => {
   for (var item in needs_list) {
     in_out_list[item] = needs_list[item];
   }//将需求目标添至计算的实际需求列表中
-  for (const id in natural_production_line) {
-    var recipe = game_data.recipe_data[item_data[natural_production_line[id]["目标物品"]][natural_production_line[id]["recipe_id"]]];
+  console.warn('----natural_production_line', natural_production_line);
 
-    var recipe_time = 60 * natural_production_line[id]["建筑数量"] * game_data.factory_data[recipe["facility"]][natural_production_line[id]["architecture"]]["倍率"] / recipe["time"];
+  for (const id in natural_production_line) {
+    console.log('natural_production_line', natural_production_line);
+
+    var recipe = game_data.recipe_data[item_data[natural_production_line[id]["targetName"]][natural_production_line[id]["recipe_id"]]];
+
+    var recipe_time = 60 * natural_production_line[id]["targetSum"] * game_data.factory_data[recipe["facility"]][natural_production_line[id]["architecture"]]["倍率"] / recipe["time"];
     console.log("recipe_time", recipe_time);
     if ((natural_production_line[id]["additional_level"] == 0) || (natural_production_line[id]["additional_mode"] == 0)) {
       for (var item in recipe["material"]) {
@@ -557,12 +561,14 @@ export const calculate = (needs_list) => {
           in_out_list[item] = -1 * recipe["product"][item] * recipe_time;
         }
       }
+
     } else {
       var num = 0;//单次配方喷涂的物品量
       for (var item in recipe["material"]) {
         num += recipe["material"][item];
       }
       num = Number(num) * recipe_time;
+
       if (natural_production_line[id]["additional_mode"] == 1) {//增产
         var pro_time = game_data.proliferate_effect[natural_production_line[id]["additional_level"]]["additional_effect"];
         for (var item in recipe["material"]) {
@@ -589,8 +595,7 @@ export const calculate = (needs_list) => {
             in_out_list[item] = -1 * recipe["product"][item] * recipe_time * pro_time;
           }
         }
-      }
-      else if (natural_production_line[id]["additional_mode"] == 2) {//加速
+      } else if (natural_production_line[id]["additional_mode"] == 2) {//加速
         var pro_time = game_data.proliferate_effect[natural_production_line[id]["additional_level"]]["speedup"];
         for (var item in recipe["material"]) {
           if (item in in_out_list) {
@@ -616,8 +621,7 @@ export const calculate = (needs_list) => {
             in_out_list[item] = -1 * recipe["product"][item] * recipe_time * pro_time;
           }
         }
-      }
-      else if (natural_production_line[id]["additional_mode"] == 4) {
+      } else if (natural_production_line[id]["additional_mode"] == 4) {
         var pro_time = game_data.proliferate_effect[natural_production_line[id]["additional_level"]]["speedup"];
         for (var item in recipe["material"]) {
           if (item in in_out_list) {
@@ -643,6 +647,7 @@ export const calculate = (needs_list) => {
             in_out_list[item] = -1 * recipe["product"][item] * recipe_time * pro_time;
           }
         }
+
       }
     }
   }//将固有产线的输入输出添至计算的实际需求列表中
@@ -768,6 +773,7 @@ export const calculate = (needs_list) => {
   list_data = list_data.filter(item => {
     return !(Number(item.efficiency) == 0 && !excessProduct[item.key])
   })
+  console.log('固定产线配置natural_production_line', natural_production_line);
   return {
     result_dict,
     building_list,
@@ -776,7 +782,9 @@ export const calculate = (needs_list) => {
     recipe_lists,
     mineralize_list,
     energy_cost,
+    lp_surplus_list,
     list_data: list_data,
+    natural_production_line,
     scheme_for_recipe: scheme_data.scheme_for_recipe,
     item_recipe_choices: scheme_data.item_recipe_choices,
   }
@@ -817,7 +825,7 @@ function init_scheme_data() {
   };
   for (var factory in game_data.factory_data) {
     for (var building_id in game_data.factory_data[factory]) {
-      scheme_data.cost_weight["construction_cost"][game_data.factory_data[factory][building_id]["名称"]] = 0;
+      scheme_data.cost_weight["construction_cost"][game_data.factory_data[factory][building_id]["name"]] = 0;
     }
   }
   for (var item in item_data) {
@@ -938,9 +946,6 @@ function build_item_graph() {
     }
 
     for (const material in item_graph[item]["material"]) {
-      if (item_graph[material] === undefined) {
-        debugger
-      }
       item_graph[material]["is-production"][item] = 1 / item_graph[item]["material"][material];
     }
 
@@ -995,16 +1000,16 @@ function build_item_graph() {
     var building_info = game_data.factory_data[factory_type][scheme_data.scheme_for_recipe[recipe_id]["architecture"]];
     if (factory_type == "采矿设备" || factory_type == "抽水设备" || factory_type == "抽油设备" || factory_type == "orbital_collector") {
       item_graph[item]["output-ratio"] *= scheme_data.mining_rate["科技面板倍率"];
-      if (building_info["名称"] == "mining_drill") {
+      if (building_info["name"] == "mining_drill") {
         item_graph[item]["output-ratio"] *= scheme_data.mining_rate["小矿机覆盖矿脉数"];
       }
-      else if (building_info["名称"] == "mining_drill_mk2") {
+      else if (building_info["name"] == "mining_drill_mk2") {
         item_graph[item]["output-ratio"] *= (scheme_data.mining_rate["大矿机覆盖矿脉数"] * scheme_data.mining_rate["大矿机工作倍率"]);
       }
-      else if (building_info["名称"] == "oil_extractor") {
+      else if (building_info["name"] == "oil_extractor") {
         item_graph[item]["output-ratio"] *= scheme_data.mining_rate["油井期望面板"];
       }
-      else if (building_info["名称"] == "orbital_collector") {
+      else if (building_info["name"] == "orbital_collector") {
         if (item == "hydrogen") {
           //氢
           item_graph[item]["output-ratio"] *= scheme_data.mining_rate["巨星氢面板"];
@@ -1020,12 +1025,12 @@ function build_item_graph() {
       }
     }//采矿设备需算上科技加成
     else if (factory_type == "分馏设备") {
-      if (building_info["名称"] == "fractionator") {
+      if (building_info["name"] == "fractionator") {
         item_graph[item]["output-ratio"] *= scheme_data.fractionating_speed / 60;
       }
     }
     else if (factory_type == "轻型工业机甲") {
-      if (building_info["名称"] == "伊卡洛斯") {
+      if (building_info["name"] == "Icarus") {
         item_graph[item]["output-ratio"] *= scheme_data.mining_rate["伊卡洛斯手速"];
       }
     }//毫无意义，只是我想这么干
@@ -1164,13 +1169,13 @@ function get_item_cost(item) {
   var building_info = game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]];
   var building_count_per_yield = 1 / item_graph[item]["output-ratio"] / building_info["倍率"];
   var layer_count = 1;
-  if (building_info["名称"] in stackable_buildings) {
-    layer_count = stackable_buildings[building_info["名称"]];
+  if (building_info["name"] in stackable_buildings) {
+    layer_count = stackable_buildings[building_info["name"]];
   }
   cost = Number(cost) + building_count_per_yield * scheme_data.cost_weight["占地"] * building_info["占地"] / layer_count;//计算占地造成的成本=单位产能建筑数*占地成本权重*建筑占地
   cost = Number(cost) + building_count_per_yield * scheme_data.cost_weight["电力"] * building_info["耗能"] * game_data.proliferate_effect[scheme_data.scheme_for_recipe[recipe_id]["additional_level"]]["power-ratio"];
   //计算耗电造成的成本 = 单位产能建筑数 * 耗电成本权重 * 建筑耗电 * 喷涂影响
-  cost = Number(cost) + building_count_per_yield * (0 * scheme_data.cost_weight["construction_cost"]["分拣器"] / layer_count + scheme_data.cost_weight["construction_cost"][building_info["名称"]]);
+  cost = Number(cost) + building_count_per_yield * (0 * scheme_data.cost_weight["construction_cost"]["分拣器"] / layer_count + scheme_data.cost_weight["construction_cost"][building_info["name"]]);
   //建筑产生的成本 = 单位产能建筑数*(每个结构中分拣器数量*分拣器成本 + 生产construction_cost 建筑成本)，分拣器成本那块，说是分拣器，但实际上可以是任何一个针对各种配方独立成本的系数
   return cost;
 }//计算一个物品的成本，用于各种各样的线性规划
@@ -1258,6 +1263,7 @@ function get_linear_programming_list() {
   for (var item in lp_item_dict) {
     result_dict[item] = 0;//将原矿化过的线规相关物品置为0，之后用线规结果的历史产出填补
   }
+  console.log('results', results);
   for (var item in results) {
     result_dict[item] = Number(result_dict[item]) + results[item];
     for (var material in item_graph[item]["material"]) {
@@ -1307,18 +1313,18 @@ function show_result_dict() {
     offset = 0.49994 * 0.1 ** fixed_num;//未显示的部分进一法取整
     var build_number = amount / 60 * factory_per_yield + offset;
     if (Math.ceil(build_number - 0.5 * 0.1 ** fixed_num) != 0) {
-      if (game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["名称"] in building_list) {
-        building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["名称"]] = Number(building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["名称"]]) + Math.ceil(build_number - 0.5 * 0.1 ** fixed_num);
+      if (game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"] in building_list) {
+        building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"]] = Number(building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"]]) + Math.ceil(build_number - 0.5 * 0.1 ** fixed_num);
       }
       else {
-        building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["名称"]] = Math.ceil(build_number - 0.5 * 0.1 ** fixed_num);
+        building_list[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"]] = Math.ceil(build_number - 0.5 * 0.1 ** fixed_num);
       }
     }
     game_data.factory_data[""]
     var factory = game_data.recipe_data[recipe_id]["facility"];
     if (factory != "巨星采集" && !(!scheme_data.energy_contain_miner && (factory == "采矿设备" || factory == "抽水设备" || factory == "抽油设备"))) {
       var e_cost = build_number * game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["耗能"];
-      if (game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["名称"] == "大型采矿机") {
+      if (game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"] == "大型采矿机") {
         e_cost = scheme_data.mining_rate["大矿机工作倍率"] * scheme_data.mining_rate["大矿机工作倍率"] * (2.94 - 0.168) + 0.168;
       }
       if (scheme_for_recipe["additional_mode"] != 0 && scheme_for_recipe["additional_level"] != 0) {
@@ -1374,10 +1380,10 @@ function show_result_dict() {
         key: i,
         efficiency: get_gross_output(result_dict[i], i).toFixed(fixed_num),
         // 文字形式
-        // factoriesNum: `${DSP[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["名称"]].name} * ${factory_number + is_mineralized(i)}`,
+        // factoriesNum: `${DSP[game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["name"]].name} * ${factory_number + is_mineralized(i)}`,
         //图片形式
         factoriesNum: {
-          key: game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["名称"],
+          key: game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["name"],
           num: factory_number + is_mineralized(i),
           is_mineralized: is_mineralized(i) === "(原矿化)"
         }
@@ -1385,15 +1391,16 @@ function show_result_dict() {
     )
 
     // str += "<tr id=\"row_of_" + i + "\"><th><a href=\"Javascript:mineralize('" + i + "')\">视为原矿</a></th>" + //操作
-    //   "<th>" + "<img src=\"./image/" + i + ".png\" title=\"" + i + "\" style=\"width: 40px; height: 40px;\">" + "</th>" +  //目标物品
+    //   "<th>" + "<img src=\"./image/" + i + ".png\" title=\"" + i + "\" style=\"width: 40px; height: 40px;\">" + "</th>" +  //targetName
     //   "<th id=\"num_of_" + i + "\">" + get_gross_output(result_dict[i], i).toFixed(fixed_num) + "</th>" +  //分钟毛产出
-    //   "<th><p id=\"factory_counts_of_" + i + "\" value=\"" + factory_number + "\">" + game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["名称"] +
+    //   "<th><p id=\"factory_counts_of_" + i + "\" value=\"" + factory_number + "\">" + game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_data.scheme_for_recipe[recipe_id]["architecture"]]["name"] +
     //   " * " + factory_number + is_mineralized(i) + "</p></th>" +  //所需工厂*数目
     //   "<th><select id=\"recipe_for_" + i + "\" onChange=\"c('" + i + "')\"></select></th>" + // 所选配方
     //   "<th><select id=\"pro_num_for_" + i + "\" onChange=\"ChangeSchemeOf('" + i + "')\"></select></th>" + //所选增产剂
     //   "<th><select id=\"pro_mode_for_" + i + "\" onChange=\"ChangeSchemeOf('" + i + "')\"></select></th>" + //所选additional_mode
     //   "<th><select id=\"factory_for_" + i + "\" onChange=\"ChangeSchemeOf('" + i + "')\"></select></th></tr>";//所选工厂种类
   }
+  console.log('result_dict', result_dict);
 
   var total_item_dict = JSON.parse(JSON.stringify(result_dict));
   for (var i in result_dict) {
@@ -1406,16 +1413,16 @@ function show_result_dict() {
   //   }
   // }
   for (var NPId in natural_production_line) {
-    var recipe = game_data.recipe_data[item_data[natural_production_line[NPId]["目标物品"]][natural_production_line[NPId]["recipe_id"]]];
+    var recipe = game_data.recipe_data[item_data[natural_production_line[NPId]["targetName"]][natural_production_line[NPId]["recipe_id"]]];
     var building = game_data.factory_data[recipe["facility"]][natural_production_line[NPId]["architecture"]];
     if (building in building_list) {
-      building_list[building["名称"]] = Number(building_list[building["名称"]]) + Math.ceil(natural_production_line[NPId]["建筑数量"]);
+      building_list[building["name"]] = Number(building_list[building["name"]]) + Math.ceil(natural_production_line[NPId]["targetSum"]);
     }
     else {
-      building_list[building["名称"]] = Math.ceil(natural_production_line[NPId]["建筑数量"]);
+      building_list[building["name"]] = Math.ceil(natural_production_line[NPId]["targetSum"]);
     }
     if (recipe["facility"] != "巨星采集" && !(!scheme_data.energy_contain_miner && (recipe["facility"] == "采矿设备" || recipe["facility"] == "抽水设备" || recipe["facility"] == "抽油设备"))) {
-      var e_cost = natural_production_line[NPId]["建筑数量"] * building["耗能"];
+      var e_cost = natural_production_line[NPId]["targetSum"] * building["power-ratio"];
       if (natural_production_line[NPId]["additional_level"] != 0 && natural_production_line[NPId]["additional_mode"] != 0) {
         e_cost *= game_data.proliferate_effect[natural_production_line[NPId]["additional_level"]]["power-ratio"];
       }
@@ -1468,13 +1475,14 @@ function recipe_to_html(recipe) {
   trick.time = recipe["time"]
   trick.facility = recipe["facility"]
   return trick;
-}//配方选项的展示格式，有空把它换成图形界面
+}
 
 
 
 export const get_item_recipe_choices = (key) => {
 
   let recipe_id = item_data[key][scheme_data.item_recipe_choices[key]];
+
   const additional_level = scheme_data.scheme_for_recipe[recipe_id]["additional_level"]
   const additional_mode = scheme_data.scheme_for_recipe[recipe_id]["additional_mode"]
   const architecture = scheme_data.scheme_for_recipe[recipe_id]["architecture"]
@@ -1487,15 +1495,18 @@ export const get_item_recipe_choices = (key) => {
   }
 }
 export const set_item_recipe_choices = (key, type, index) => {
+
   let recipe_id = item_data[key][scheme_data.item_recipe_choices[key]];
   const types = ["additional_level", "additional_mode", "architecture", "additional_mode_index"]
   if (types.indexOf(type) !== -1) {
+
     scheme_data.scheme_for_recipe[recipe_id][type] = index
   }
 }
 
 // 获取单个配置数据
 export const get_one_item_recipe_choices = (key, type, index) => {
+
   // 修改单个配置数据
   let recipe_id = item_data[key][scheme_data.item_recipe_choices[key]];
   const types = ["additional_level", "additional_mode", "architecture", "additional_mode_index"]
@@ -1506,6 +1517,7 @@ export const get_one_item_recipe_choices = (key, type, index) => {
     return ""
   }
 }
+// 目标产物配方选择
 export const change_recipe_of = (key, index) => {
   scheme_data.item_recipe_choices[key] = index
   let recipe_id = item_data[key][scheme_data.item_recipe_choices[key]];
@@ -1561,3 +1573,15 @@ export const unMineralize = (item) => {
   item_graph[item] = JSON.parse(JSON.stringify(mineralize_list[item]));
   delete mineralize_list[item];
 }//取消原矿化
+
+
+// 添加一个固定产线 目标物
+export const update_fixed_recipe = (data) => {
+
+  natural_production_line = data
+}
+// 删除一个固定产线 目标物
+export const del_fixed_recipe = (key) => {
+  console.log(natural_production_line);
+  natural_production_line = natural_production_line.filter(item => item.targetName !== key)
+}

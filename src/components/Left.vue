@@ -1,11 +1,18 @@
 <template>
   <div class="container-left">
-    <div class="title flex justify-between items-center">
+    <div class="title flex justify-between items-center" v-if="theme.compact">
       <span></span>
-      <h1 v-if="theme.compact" class="bg-light-50">更多设置</h1>
+      <h1 v-if="theme.compact" class=" ">更多设置</h1>
 
-      <el-tooltip class="box-item" effect="dark" show-after="300" content="点击展开更多设置" placement="right">
-        <el-icon :size="18" color="#222" class="mr-3">
+      <el-tooltip
+        class="box-item"
+        :show-after="300"
+        :auto-close="3000"
+        content="点击展开更多设置"
+        placement="right"
+        ref="tooltips"
+      >
+        <el-icon :size="18" class="mr-3 ml-5">
           <button class="icon-btn mx-2 !outline-none" @click="click()">
             <i-zondicons:indent-decrease v-if="theme.compact" class="icon-footer" />
             <i-zondicons:indent-increase v-else class="icon-footer -rotate-x-180" />
@@ -17,13 +24,13 @@
       <!-- 采矿默认参数设置 -->
       <div class=" ">
         <h2
-          class="sticky z-99 top-0 text-lg flex justify-center items-center bg-light-50"
+          class="sticky z-99 top-0 text-lg flex justify-center items-center"
           @click="showMiningConfig = !showMiningConfig"
         >
           配置当前工厂的默认参数
           <div class="pt-2 ml-5">
             <el-tooltip
-              show-after="300"
+              :show-after="300"
               class="box-item"
               effect="dark"
               :content="showMiningConfig ? '点击收起' : '点击展开'"
@@ -32,7 +39,7 @@
               <i-zondicons:arrow-thick-up v-if="showMiningConfig" />
               <i-zondicons:arrow-thick-down v-else />
             </el-tooltip>
-            <el-tooltip show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
+            <el-tooltip :show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
               <i-ant-design:delete-filled class="ml-2" @click.stop="config.restoreMinings()" />
             </el-tooltip>
           </div>
@@ -164,13 +171,13 @@
       <!-- 工厂默认参数设置 -->
       <div class=" ">
         <h2
-          class="sticky top-0 text-lg flex justify-center items-center bg-light-50"
+          class="sticky top-0 text-lg flex justify-center items-center"
           @click="showFactoryConfig = !showFactoryConfig"
         >
           批量配置工厂设置
           <div class="pt-2 ml-5">
             <el-tooltip
-              show-after="300"
+              :show-after="300"
               class="box-item"
               effect="dark"
               :content="showFactoryConfig ? '点击收起' : '点击展开'"
@@ -179,7 +186,7 @@
               <i-zondicons:arrow-thick-up v-if="showFactoryConfig" />
               <i-zondicons:arrow-thick-down v-else />
             </el-tooltip>
-            <el-tooltip show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
+            <el-tooltip :show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
               <i-ant-design:delete-filled class="ml-2" @click.stop="config.restoreFactory()" />
             </el-tooltip>
           </div>
@@ -330,7 +337,7 @@ import {
 } from '@/utils/calculate';
 const theme = useThemeStore();
 const config = useConfigStore();
-
+const tooltips = ref(null);
 const { t, availableLocales, locale } = useI18n();
 const widthOT = computed(() => {
   return theme.compact ? '420px' : '0px';
@@ -344,6 +351,12 @@ const restorConfig = () => {
   config.restoreFactory();
 };
 const click = () => {
+  console.log('1122?', tooltips);
+  setTimeout(() => {
+    if (tooltips.value != null) {
+      tooltips.value.hide();
+    }
+  }, 150);
   // 点击切换侧边栏状态;
   theme.changeCompact();
 };
@@ -420,7 +433,6 @@ const showFactoryConfig = ref(true);
   font-weight: 700;
 }
 .container-left {
-  background-color: #fff;
   border-right: 2px solid #eee;
   z-index: 100;
   height: 100vh;
@@ -435,6 +447,9 @@ const showFactoryConfig = ref(true);
 .nvmer {
   height: calc(100vh - 45px);
   min-width: 323px;
+}
+.nvmer h2 {
+  background-color: var(--bg-color);
 }
 .nvmer::-webkit-scrollbar {
   width: 5px;

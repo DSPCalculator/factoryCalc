@@ -1,5 +1,10 @@
-@import 'element-plus/theme-chalk/dark/css-vars.css';
+@import "element-plus/theme-chalk/dark/css-vars.css";
 
 body {
   @apply text-gray-700 dark: bg-gray-800 dark:text-gray-200;
+}
+.dark body {
+  --bg-color: rgba(31, 41, 55, 1);
+  --bg-select-color: rgb(63, 83, 112);
+  --bg-select-activate-color: rgb(90, 118, 160);
 }

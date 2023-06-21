@@ -3,7 +3,7 @@
     <el-dialog v-model="props.visible" @close="close">
       <div id="yin-yang">
         <div class="box-content">
-          <h2 class="text-content pl-8 .text-xl font-black">添加目标参数</h2>
+          <h2 class="text-content pl-8 .text-xl font-black">{{ props.title }}</h2>
           <hr />
           <menu>
             <ul class="flex">
@@ -45,8 +45,12 @@
           </div>
           <hr />
           <div class="pt-3">
-            <p class="pl-8 text-lg">
+            <p class="pl-8 text-lg" v-if="isMod">
               设置当前产物效率
+              <el-input-number class="ml-3" v-model="num" size="small" controls-position="right" />
+            </p>
+            <p class="pl-8 text-lg" v-else>
+              选择targetSum
               <el-input-number class="ml-3" v-model="num" size="small" controls-position="right" />
             </p>
           </div>
@@ -62,6 +66,7 @@ import DSP from '@/assets/data/DSP';
 import list from '@/assets/data/list';
 
 const props = defineProps({
+  title: String,
   visible: Boolean,
   close: Function,
   clickSelect: Function,
@@ -71,11 +76,16 @@ watch(
   async (visible) => {
     if (visible) {
       itemNumber.value = null;
-      num.value = 60;
+      isMod.value = props.title == '选择目标产物';
+      if (isMod.value) {
+        num.value = 60;
+      } else {
+        num.value = 1;
+      }
     }
   },
 );
-
+const isMod = ref(true);
 const typeNumber = ref('goods');
 const itemNumber = ref(null);
 const currentSelectedProduct = computed(() => {

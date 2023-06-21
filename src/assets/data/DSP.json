@@ -10,6 +10,17 @@
       "y": "-1107"
     }
   },
+  "accelerator_0": {
+    "name": "增产剂 空",
+    "key": "accelerator_0",
+    "type": "goods",
+    "path": {
+      "width": "80",
+      "height": "80",
+      "x": "-1213",
+      "y": "-811"
+    }
+  },
   "accelerator_1": {
     "name": "增产剂 MK.Ⅰ",
     "key": "accelerator_1",
@@ -265,7 +276,7 @@
   },
   "cpu": {
     "name": "处理器",
-    "key": "copper_ore",
+    "key": "cpu",
     "type": "goods",
     "path": {
       "width": "80",

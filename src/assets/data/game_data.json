@@ -1768,7 +1768,7 @@
     }
   ],
   "proliferator_data": {
-    "不适用增产剂": {
+    "accelerator_0": {
       "喷涂次数": 2,
       "单次喷涂最高增产点数": 0,
       "增产剂名称": "不使用增产剂"
@@ -1849,148 +1849,160 @@
   "factory_data": {
     "轻型工业机甲": [
       {
-        "名称": "Icarus",
-        "耗能": 0.08,
+        "key": "0",
+        "name": "Icarus",
+        "power-ratio": 0.08,
         "倍率": 1,
         "占地": 0.01
       }
     ],
     "采矿设备": [
       {
-        "名称": "mining_drill",
-        "耗能": 0.42,
+        "key": "0",
+        "name": "mining_drill",
+        "power-ratio": 0.42,
         "倍率": 0.5,
         "占地": 15
       },
       {
-        "名称": "mining_drill_mk2",
-        "耗能": 2.94,
+        "key": "1",
+        "name": "mining_drill_mk2",
+        "power-ratio": 2.94,
         "倍率": 1,
         "占地": 25
       }
     ],
     "抽水设备": [
       {
-        "名称": "water_pump",
-        "耗能": 0.3,
+        "key": "0",
+        "name": "water_pump",
+        "power-ratio": 0.3,
         "倍率": 1,
         "占地": 12
       }
     ],
     "抽油设备": [
       {
-        "名称": "oil_extractor",
-        "耗能": 0.3,
+        "key": "0",
+        "name": "oil_extractor",
+        "power-ratio": 0.3,
         "倍率": 1,
         "占地": 50
       }
     ],
     "orbital_collector": [
       {
-        "名称": "orbital_collector",
-        "耗能": 30,
+        "key": "0",
+        "name": "orbital_collector",
+        "power-ratio": 30,
         "倍率": 8,
         "占地": 0.01
       }
     ],
     "ray_receiver": [
       {
-        "名称": "ray_receiver",
-        "耗能": 0,
+        "key": "0",
+        "name": "ray_receiver",
+        "power-ratio": 0,
         "倍率": 1,
         "占地": 54.82
       }
     ],
     "冶炼设备": [
       {
-        "名称": "smelter",
-        "耗能": 0.36,
+        "key": "0",
+        "name": "smelter",
+        "power-ratio": 0.36,
         "倍率": 1,
         "占地": 5.76
       },
       {
-        "名称": "smelter_2",
-        "耗能": 1.44,
+        "key": "1",
+        "name": "smelter_2",
+        "power-ratio": 1.44,
         "倍率": 2,
         "占地": 5.76
       }
     ],
     "production_platform": [
       {
-        "名称": "assembler_1",
-        "耗能": 0.27,
+        "key": "0",
+        "name": "assembler_1",
+        "power-ratio": 0.27,
         "倍率": 0.75,
         "占地": 10.24
       },
       {
-        "名称": "assembler_2",
-        "耗能": 0.54,
+        "key": "1",
+        "name": "assembler_2",
+        "power-ratio": 0.54,
         "倍率": 1,
         "占地": 10.24
       },
       {
-        "名称": "assembler_3",
-        "耗能": 1.08,
+        "key": "2",
+        "name": "assembler_3",
+        "power-ratio": 1.08,
         "倍率": 1.5,
         "占地": 10.24
       }
     ],
     "精炼设备": [
       {
-        "名称": "oil_refinery",
-        "耗能": 0.96,
+        "name": "oil_refinery",
+        "power-ratio": 0.96,
         "倍率": 1,
         "占地": 18
       }
     ],
     "化工设备": [
       {
-        "名称": "chemical_plant",
-        "耗能": 0.72,
+        "name": "chemical_plant",
+        "power-ratio": 0.72,
         "倍率": 1,
         "占地": 23.76
       },
       {
-        "名称": "chemical_plant_2",
-        "耗能": 2.16,
+        "name": "chemical_plant_2",
+        "power-ratio": 2.16,
         "倍率": 2,
         "占地": 23.76
       }
     ],
     "分馏设备": [
       {
-        "名称": "fractionator",
-        "耗能": 0.72,
+        "name": "fractionator",
+        "power-ratio": 0.72,
         "倍率": 1,
         "占地": 12.96
       }
     ],
     "hadron_collider": [
       {
-        "名称": "hadron_collider",
-        "耗能": 12,
+        "name": "hadron_collider",
+        "power-ratio": 12,
         "倍率": 1,
         "占地": 45.12
       }
     ],
     "research_equipment": [
       {
-        "名称": "lab",
-        "耗能": 0.48,
+        "name": "lab",
+        "power-ratio": 0.48,
         "倍率": 1,
         "占地": 20.25
       }
     ],
     "充电设备": [
       {
-        "名称": "energy_exchanger",
-        "耗能": 45,
+        "name": "energy_exchanger",
+        "power-ratio": 45,
         "倍率": 50,
         "占地": 64
       },
       {
-        "名称": "accumulator",
-        "耗能": 0.9,
+        "name": "accumulator",
+        "power-ratio": 0.9,
         "倍率": 1,
         "占地": 4
       }
