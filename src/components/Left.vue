@@ -21,6 +21,151 @@
       </el-tooltip>
     </div>
     <div class="nvmer overflow-y-auto" v-if="theme.compact">
+      <!-- 工厂默认参数设置 -->
+      <div class=" ">
+        <h2
+          class="sticky top-0 text-lg flex justify-center items-center"
+          @click="showFactoryConfig = !showFactoryConfig"
+        >
+          批量配置工厂设置
+          <div class="pt-2 ml-5">
+            <el-tooltip
+              :show-after="300"
+              class="box-item"
+              effect="dark"
+              :content="showFactoryConfig ? '点击收起' : '点击展开'"
+              placement="top"
+            >
+              <i-zondicons:arrow-thick-up v-if="showFactoryConfig" />
+              <i-zondicons:arrow-thick-down v-else />
+            </el-tooltip>
+            <el-tooltip :show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
+              <i-ant-design:delete-filled class="ml-2" @click.stop="config.restoreFactory()" />
+            </el-tooltip>
+          </div>
+        </h2>
+        <ul class="m-3 overflow-y-auto" :style="{ height: showFactoryConfig ? '380px' : '0px' }">
+          <li class="items-center">
+            默认采矿设备1
+            <el-select
+              v-model="config.defaultMining"
+              @change="changeMiningConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认冶炼设备
+            <el-select
+              v-model="config.defaultSmelting"
+              @change="changeSmeltingConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningSmeltingOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认制造
+            <el-select
+              v-model="config.defaultProduction"
+              @change="changeProductionConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningProductionOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认化工
+            <el-select
+              v-model="config.defaultChemical"
+              @change="changeChemicalConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningChemicalOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认充电
+            <el-select
+              v-model="config.defaultCharge"
+              @change="changeChargeConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningChargeOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认喷涂点数
+            <el-select
+              v-model="config.defaultSpraying"
+              @change="changeSprayingConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.miningSprayingOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+          <li class="items-center">
+            默认增产模式
+            <el-select
+              v-model="config.defaultInc"
+              @change="changeIncConfig"
+              class="m-2"
+              placeholder="Select"
+              size="small"
+            >
+              <el-option
+                v-for="option in config.IncOptions"
+                :key="option"
+                :label="labelHandel(option)"
+                :value="option.key"
+              />
+            </el-select>
+          </li>
+        </ul>
+      </div>
       <!-- 采矿默认参数设置 -->
       <div class=" ">
         <h2
@@ -168,151 +313,7 @@
           </li>
         </ul>
       </div>
-      <!-- 工厂默认参数设置 -->
-      <div class=" ">
-        <h2
-          class="sticky top-0 text-lg flex justify-center items-center"
-          @click="showFactoryConfig = !showFactoryConfig"
-        >
-          批量配置工厂设置
-          <div class="pt-2 ml-5">
-            <el-tooltip
-              :show-after="300"
-              class="box-item"
-              effect="dark"
-              :content="showFactoryConfig ? '点击收起' : '点击展开'"
-              placement="top"
-            >
-              <i-zondicons:arrow-thick-up v-if="showFactoryConfig" />
-              <i-zondicons:arrow-thick-down v-else />
-            </el-tooltip>
-            <el-tooltip :show-after="300" class="box-item" effect="dark" content="删除恢复默认" placement="top">
-              <i-ant-design:delete-filled class="ml-2" @click.stop="config.restoreFactory()" />
-            </el-tooltip>
-          </div>
-        </h2>
-        <ul class="m-3 overflow-y-auto" :style="{ height: showFactoryConfig ? '380px' : '0px' }">
-          <li class="items-center">
-            默认采矿设备1
-            <el-select
-              v-model="config.defaultMining"
-              @change="changeMiningConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认冶炼设备
-            <el-select
-              v-model="config.defaultSmelting"
-              @change="changeSmeltingConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningSmeltingOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认制造
-            <el-select
-              v-model="config.defaultProduction"
-              @change="changeProductionConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningProductionOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认化工
-            <el-select
-              v-model="config.defaultChemical"
-              @change="changeChemicalConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningChemicalOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认充电
-            <el-select
-              v-model="config.defaultCharge"
-              @change="changeChargeConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningChargeOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认喷涂点数
-            <el-select
-              v-model="config.defaultSpraying"
-              @change="changeSprayingConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.miningSprayingOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-          <li class="items-center">
-            默认增产模式
-            <el-select
-              v-model="config.defaultInc"
-              @change="changeIncConfig"
-              class="m-2"
-              placeholder="Select"
-              size="small"
-            >
-              <el-option
-                v-for="option in config.IncOptions"
-                :key="option"
-                :label="labelHandel(option)"
-                :value="option.key"
-              />
-            </el-select>
-          </li>
-        </ul>
-      </div>
+
       <!-- 操作按钮区 -->
       <div class="flex justify-center items-center">
         <el-button type="warning" round @click="restorConfig">清除所有配置信息</el-button>
@@ -343,12 +344,18 @@ const widthOT = computed(() => {
   return theme.compact ? '420px' : '0px';
 });
 const restorConfig = () => {
-  ElMessage({
-    message: '重置了所有配置信息',
+  ElMessageBox.confirm('确认清理,清理会导致所有配置清除,包括保存的配置,并且会刷新页面?', '注意', {
+    confirmButtonText: '清理',
+    cancelButtonText: '不清理',
     type: 'warning',
+  }).then(() => {
+    ElMessage({
+      type: 'success',
+      message: '清理成功',
+    });
+    localStorage.clear();
+    location.reload();
   });
-  config.restoreMinings();
-  config.restoreFactory();
 };
 const click = () => {
   console.log('1122?', tooltips);

@@ -7,6 +7,8 @@ const config = defineStore({
   persist: true,
   state: () => {
     return {
+      recipeList: [],
+      recipeListDate: {},
       isChange: false, // 检测是否数据发生变化, 发生变化的时候就重新计算公式参数
       scienceResearchSpeed: 1, //科技研究速度
       miniCore: 8, //小型矿机默认覆盖矿脉的数量
@@ -101,12 +103,12 @@ const config = defineStore({
           label: '增产剂MK.Ⅲ',
         },
       ],
-      defaultInc: '0', // 默认增产模式 0 不适用增产剂 1 使用增产， 2 使用加速
+      defaultInc: '0', // 默认增产 0 不适用增产剂 1 使用增产， 2 使用加速
       miningIncOptions: [
         [
           {
             key: '0',
-            name: '该产物不支持使用增产剂',
+            name: '该配方不支持',
           },
         ],
         [
@@ -116,7 +118,7 @@ const config = defineStore({
           },
           {
             key: '1',
-            name: '增产模式',
+            name: '增产',
           },
         ],
         [
@@ -126,17 +128,17 @@ const config = defineStore({
           },
           {
             key: '2',
-            name: '加速模式',
+            name: '加速',
           },
         ],
         [
           {
             key: '1',
-            name: '增产模式',
+            name: '增产',
           },
           {
             key: '2',
-            name: '加速模式',
+            name: '加速',
           },
         ],
         [
@@ -152,12 +154,16 @@ const config = defineStore({
       ],
       IncOptions: [
         {
+          key: '0',
+          name: '不使用',
+        },
+        {
           key: '1',
-          name: '增产模式',
+          name: '增产',
         },
         {
           key: '2',
-          name: '加速模式',
+          name: '加速',
         },
       ],
     };
