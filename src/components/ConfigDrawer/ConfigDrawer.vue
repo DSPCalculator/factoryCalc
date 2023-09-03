@@ -8,7 +8,7 @@
     <div><span class="mr-3">修改默认添加产物数量</span><el-switch v-model="largeFont6" size="large" /></div>
     <div class="mr-3">
       修改产物计算速度单位为
-      <el-select v-model="value" class="m-2" placeholder="Select" size="large">
+      <el-select v-model="value" class="m-2" placeholder="Select" size="large" @change="config.changeProductEfficiency">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>
@@ -16,29 +16,24 @@
 </template>
 
 <script lang="ts" setup>
+import useConfigStore from '@/store/config';
+const config = useConfigStore();
 const props = defineProps({
   show: Boolean,
   close: Function,
 });
+
 const largeFont = ref(false);
 const largeFont2 = ref(false);
 const largeFont3 = ref(false);
 const largeFont4 = ref(false);
 const largeFont5 = ref(false);
 const largeFont6 = ref(false);
-const value = ref('m');
-const options = reactive([
-  {
-    value: 's',
-    label: '秒',
-  },
-  {
-    value: 'm',
-    label: '分',
-  },
-  {
-    value: 'h',
-    label: '时',
-  },
-]);
+console.log('111');
+
+const value = ref(config.productEfficiency);
+const options = reactive(config.productEfficiencyOption);
+const productChange = (value) => {
+  console.log('value', value);
+};
 </script>

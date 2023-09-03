@@ -166,6 +166,21 @@ const config = defineStore({
           name: '加速',
         },
       ],
+      productEfficiency: 'm',
+      productEfficiencyOption: [
+        {
+          value: 's',
+          label: '秒',
+        },
+        {
+          value: 'm',
+          label: '分',
+        },
+        {
+          value: 'h',
+          label: '时',
+        },
+      ],
     };
   },
   // 等同于vuex的getter
@@ -204,6 +219,9 @@ const config = defineStore({
     change_energy_contain_miner() {
       this.changeConfig();
       this.energy_contain_miner = this.energy_contain_miner ? 0 : 1;
+    },
+    changeProductEfficiency(value) {
+      this.productEfficiency = value;
     },
   },
 });

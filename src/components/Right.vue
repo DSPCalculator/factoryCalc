@@ -67,7 +67,8 @@
             <ProductImg :key="key" :imgKey="key" class="mx-4" />
             <div class="mx-4 w-35 text-center">{{ DSP[key].name }}</div>
             <el-input-number v-model="productList[key]" controls-position="right" :min="0" class="mx-4 h-8" />
-            / 分钟
+            {{ config.productEfficiency }}
+            / {{ config.productEfficiencyOption.filter((item) => item.value == config.productEfficiency) }}
           </div>
         </div>
 
@@ -497,6 +498,7 @@ const selectProduct = (selectItem: { key: string; num: number }) => {
 };
 
 const closeProduct = () => {
+  console.error('❌%c1111', 'color: red; font-size: 20px');
   calculate();
   dialogFormVisible.value = false;
 };
