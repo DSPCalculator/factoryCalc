@@ -18,7 +18,7 @@
     "@element-plus/icons-vue": "^2.1.0",
     "@vueuse/core": "^8.9.4",
     "axios": "^0.25.0",
-    "element-plus": "^2.3.6",
+    "element-plus": "^2.3.7",
     "javascript-lp-solver": "^0.4.24",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.4",
