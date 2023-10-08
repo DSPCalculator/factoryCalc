@@ -1566,7 +1566,7 @@
         "titanium_alloy": 20,
         "cpu": 8,
         "frame_material": 20,
-        "hyper_magnetism_ring": 50,
+        "hyper_magnetism_ring": 25,
         "graphene": 10
       },
       "product": {
@@ -1614,7 +1614,7 @@
         "assembler_1": 1
       },
       "facility": "production_platform",
-      "time": 0.5,
+      "time": 2,
       "additional_mode": 3
     },
     {
