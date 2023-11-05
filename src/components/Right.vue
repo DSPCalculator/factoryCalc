@@ -44,11 +44,9 @@
                   </div>
                 </el-option>
               </el-select>
-              <el-button type="primary" style="margin-left: 16px" @click="dddoption">保存配置 </el-button>
+              <el-button type="primary" style="margin-left: 16px" @click="saveConfig">保存配置 </el-button>
             </dev>
-            <span>
-              {{ devModel ? productList : '' }}
-            </span>
+
             <el-tooltip :content="isDark ? t('change light') : t('change dark')" placement="top">
               <button class="flex items-center icon-btn mx-2 !outline-none" @click="toggleDark()">
                 <i-ph-cloud-moon-bold v-if="isDark" class="icon-footer" />
@@ -62,13 +60,15 @@
         <div v-show="productList" class=" ">
           <!--  目标产线内容 -->
           <h2 class="pl-3">目标产线内容</h2>
-          <div class="product flex items-center" v-for="key in Object.keys(productList)">
+          <div class="product flex items-center pl-5" v-for="key in Object.keys(productList)">
             <el-button type="primary" :icon="Delete" @click="delProduct('product', key)" />
             <ProductImg :key="key" :imgKey="key" class="mx-4" />
             <div class="mx-4 w-35 text-center">{{ DSP[key].name }}</div>
             <el-input-number v-model="productList[key]" controls-position="right" :min="0" class="mx-4 h-8" />
-            {{ config.productEfficiency }}
-            / {{ config.productEfficiencyOption.filter((item) => item.value == config.productEfficiency) }}
+            / 分
+            <!-- {{ config.productEfficiency }} -->
+
+            <!-- / {{ config.productEfficiencyOption.filter((item) => item.value == config.productEfficiency) }} -->
           </div>
         </div>
 
@@ -346,6 +346,9 @@
         </template>
 
         <EnReadme class=""></EnReadme>
+        <span>
+          {{ devModel ? productList : '' }}
+        </span>
       </div>
     </div>
     <FormulaSelectionDialog
@@ -361,6 +364,7 @@
 
 <script setup lang="ts">
 import { isDark, toggleDark } from '@/utils/dark';
+import { reactive, markNonReactive } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import useCounterStore from '@/store/theme';
 import useConfigStore from '@/store/config';
@@ -406,13 +410,37 @@ const addOption = (event) => {
     recipeName.value = input;
   }
 };
-const dddoption = () => {
+const saveConfig = () => {
   console.log('recipeName.value', recipeName.value);
 
   if (recipeName.value.length > 0) {
-    config.recipeListDate[toRaw(recipeName.value)] = {
-      productList: toRaw(productList.value),
-      fixedProduction: toRaw(fixedProduction.value),
+    let rawProductList = toRaw(productList.value);
+    let rawFixedProduction = toRaw(fixedProduction.value);
+    let key = toRaw(recipeName.value);
+    let copyConfig = JSON.parse(JSON.stringify(config));
+    config.recipeListDate[key] = {
+      productList: rawProductList,
+      fixedProduction: rawFixedProduction,
+      config: {
+        scienceResearchSpeed: copyConfig.scienceResearchSpeed,
+        miniCore: copyConfig.miniCore,
+        largeCore: copyConfig.largeCore,
+        largeCoreWorkingSpeed: copyConfig.largeCoreWorkingSpeed,
+        oilWellSpeed: copyConfig.oilWellSpeed,
+        hydrogenCollectionRate: copyConfig.hydrogenCollectionRate,
+        heavyHydrogenCollectionRate: copyConfig.heavyHydrogenCollectionRate,
+        combustibleIceCollectionRate: copyConfig.combustibleIceCollectionRate,
+        shooter: copyConfig.shooter,
+        fractionatingColumnSpeed: copyConfig.fractionatingColumnSpeed,
+        energy_contain_miner: copyConfig.energy_contain_miner,
+        defaultMining: copyConfig.defaultMining,
+        defaultSmelting: copyConfig.defaultSmelting,
+        defaultProduction: copyConfig.defaultProduction,
+        defaultChemical: copyConfig.defaultChemical,
+        defaultCharge: copyConfig.defaultCharge,
+        defaultSpraying: copyConfig.defaultSpraying,
+        defaultInc: copyConfig.defaultInc,
+      },
     };
   }
 };
@@ -430,13 +458,27 @@ const changeConfigDrawer = () => {
   configDrawerShow.value = !configDrawerShow.value;
 };
 const recipeChange = (recipeKey) => {
+  console.log('recipeKey', recipeKey);
+
+  //  保存的所有配方进行切换
+  if (recipeKey == '') {
+    console.log('没有获取到参数, 故此跳出');
+
+    // 置空 选择配方
+    return;
+  }
   if (Object.keys(config.recipeListDate).length > 0 && recipeKey in config.recipeListDate) {
-    if (config.recipeListDate[recipeKey]['productList']) {
-      productList.value = config.recipeListDate[recipeKey]['productList'];
+    let data = JSON.parse(JSON.stringify(config.recipeListDate[recipeKey]));
+    console.log('toRaw data', data);
+
+    if (data['productList']) {
+      productList.value = toRaw(data['productList']);
     }
-    if (config.recipeListDate[recipeKey]['fixedProduction']) {
-      fixedProduction.value = config.recipeListDate[recipeKey]['fixedProduction'];
+    if (data['fixedProduction']) {
+      fixedProduction.value = toRaw(data['fixedProduction']);
     }
+
+    config.setConfig(data['config']);
   }
 };
 const { t, availableLocales, locale } = useI18n();
@@ -467,9 +509,32 @@ const openSelect = (key: string) => {
     dialogTitle.value = '选择固定产线';
   }
 };
+const changeUnitTime = (sum) => {
+  let Num = sum;
+  console.log('默认单位配置,', config.productEfficiency);
 
+  switch (config.productEfficiency) {
+    case 's':
+      Num = sum * 60;
+      break;
+    case 'h':
+      Num = sum / 60;
+      break;
+    default:
+      break;
+  }
+  return Num;
+};
 const selectProduct = (selectItem: { key: string; num: number }) => {
   console.log('selectItem', selectItem);
+  recipeName.value = '';
+
+  console.log('===================置空', recipeName.value);
+  // 将保存配方的名字置空
+  // recipeName.value = '';
+
+  // selectItem['num'] = changeUnitTime(selectItem['num']);
+
   if (dialogTitle.value == '选择目标产物') {
     if (selectItem.key in productList.value) {
       productList.value[selectItem.key] += selectItem.num;
@@ -498,7 +563,7 @@ const selectProduct = (selectItem: { key: string; num: number }) => {
 };
 
 const closeProduct = () => {
-  console.error('❌%c1111', 'color: red; font-size: 20px');
+  // console.error('❌%c1111', 'color: red; font-size: 20px');
   calculate();
   dialogFormVisible.value = false;
 };
@@ -532,6 +597,8 @@ const tagRecipeType = ref('goal');
 const obj = ref(false);
 //点击删除产物
 const delProduct = (type: string, key: string) => {
+  recipeName.value = '';
+
   if (type == 'fixed') {
     // 固定产物
     if (fixedProduction.value[key]) {
@@ -546,6 +613,7 @@ const delProduct = (type: string, key: string) => {
   }
 };
 const cloneSelect = () => {
+  recipeName.value = '';
   productList.value = {};
   fixedProduction.value = {};
 };
@@ -562,7 +630,17 @@ const facilityLabel = (list, key) => {
   return game_data['factory_data'][recipeList.value.recipe_lists[list[key]]['facility']];
 };
 const recipeList = computed(() => {
+  let newData = {};
   console.log('计算的需求信息', productList.value);
+  // for (const key in productList.value) {
+  //   if (Object.prototype.hasOwnProperty.call(productList.value, key)) {
+  //     const element = productList.value[key];
+  //     console.log(element);
+
+  //     // newData[key] = changeUnitTime(element);
+  //   }
+  // }
+  // console.log('newData', newData);
 
   const data = calculate(productList.value);
   // TODO 这个 console  绑定了依赖项， 如果删除，则丢失，不能相应批量改变
