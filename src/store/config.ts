@@ -187,6 +187,28 @@ const config = defineStore({
   getters: {},
   // pinia 放弃了 mutations 只使用 actions
   actions: {
+    setConfig(config) {
+      console.log('----------------------config', config);
+
+      this.scienceResearchSpeed = config.scienceResearchSpeed;
+      this.miniCore = config.miniCore;
+      this.largeCore = config.largeCore;
+      this.largeCoreWorkingSpeed = config.largeCoreWorkingSpeed;
+      this.oilWellSpeed = config.oilWellSpeed;
+      this.hydrogenCollectionRate = config.hydrogenCollectionRate;
+      this.heavyHydrogenCollectionRate = config.heavyHydrogenCollectionRate;
+      this.combustibleIceCollectionRate = config.combustibleIceCollectionRate;
+      this.shooter = config.shooter;
+      this.fractionatingColumnSpeed = config.fractionatingColumnSpeed;
+      this.energy_contain_miner = config.energy_contain_miner;
+      this.defaultMining = config.defaultMining;
+      this.defaultSmelting = config.defaultSmelting;
+      this.defaultProduction = config.defaultProduction;
+      this.defaultChemical = config.defaultChemical;
+      this.defaultCharge = config.defaultCharge;
+      this.defaultSpraying = config.defaultSpraying;
+      this.defaultInc = config.defaultInc;
+    },
     changeConfig() {
       console.error('      this.isChange', this.isChange);
 
@@ -222,6 +244,7 @@ const config = defineStore({
     },
     changeProductEfficiency(value) {
       this.productEfficiency = value;
+      this.isChange = !this.isChange;
     },
   },
 });
