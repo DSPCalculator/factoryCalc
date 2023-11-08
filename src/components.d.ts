@@ -7,17 +7,22 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ConfigDrawer: typeof import('./components/ConfigDrawer/ConfigDrawer.vue')['default']
+    Drawer: typeof import('./components/ConfigDrawer/Drawer.vue')['default']
     DSPElDialog: typeof import('./components/DSPElDialog/DSPElDialog.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElResult: typeof import('element-plus/es')['ElResult']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     EnReadme: typeof import('./components/EnReadme.md')['default']
     FormulaSelectionDialog: typeof import('./components/FormulaSelectionDialog/FormulaSelectionDialog.vue')['default']

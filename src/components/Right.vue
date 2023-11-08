@@ -18,37 +18,62 @@
             <div class="inline-block ml-2">选择目标物</div>
             <ElButton class="ml-2" @click="openSelect('productList')">添加一个新产物</ElButton>
             <ElButton @click="openSelect('fixedProduction')">添加一条固定产线</ElButton>
-            <ElButton v-show="Object.keys(productList).length > 0" @click="cloneSelect"> 清空产物列表</ElButton>
+            <ElButton
+              v-show="Object.keys(productList).length > 0 || Object.keys(fixedProduction).length > 0"
+              @click="cloneSelect"
+            >
+              清空产物列表</ElButton
+            >
           </div>
 
-          <div class="">
-            <span>
-              {{ devModel ? productList : '' }}
-            </span>
+          <div class="flex items-center justify-center">
+            <dev>
+              <el-select
+                v-model="recipeName"
+                ref="recipeRef"
+                filterable
+                @focus="tips"
+                placeholder="添加保存配方"
+                @change="recipeChange"
+                @keyup.enter="addOption"
+              >
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                  <div class="flex justify-between">
+                    <spen> {{ item.label }}</spen>
+                    <el-button type="text" @click.stop="removeOption(item.value)">删除</el-button>
+                  </div>
+                </el-option>
+              </el-select>
+              <el-button type="primary" style="margin-left: 16px" @click="saveConfig">保存配置 </el-button>
+            </dev>
+
             <el-tooltip :content="isDark ? t('change light') : t('change dark')" placement="top">
-              <button class="icon-btn mx-2 !outline-none" @click="toggleDark()">
+              <button class="flex items-center icon-btn mx-2 !outline-none" @click="toggleDark()">
                 <i-ph-cloud-moon-bold v-if="isDark" class="icon-footer" />
                 <i-ph-sun-horizon-bold v-else class="icon-footer" />
               </button>
             </el-tooltip>
+            <el-button type="primary" style="margin-left: 16px" @click="changeConfigDrawer">常用配置项 </el-button>
           </div>
         </div>
 
         <div v-show="productList" class=" ">
           <!--  目标产线内容 -->
           <h2 class="pl-3">目标产线内容</h2>
-          <div class="product flex items-center" v-for="key in Object.keys(productList)">
+          <div class="product flex items-center pl-5" v-for="key in Object.keys(productList)">
             <el-button type="primary" :icon="Delete" @click="delProduct('product', key)" />
             <ProductImg :key="key" :imgKey="key" class="mx-4" />
             <div class="mx-4 w-35 text-center">{{ DSP[key].name }}</div>
             <el-input-number v-model="productList[key]" controls-position="right" :min="0" class="mx-4 h-8" />
-            / 分钟
+            / 分
+            <!-- {{ config.productEfficiency }} -->
+
+            <!-- / {{ config.productEfficiencyOption.filter((item) => item.value == config.productEfficiency) }} -->
           </div>
         </div>
 
         <div v-show="fixedProduction" class=" ">
           <!--  固定产线内容 -->
-
           <h2 class="pl-3">
             固定产线内容
             <el-tooltip content="固定产线可以以单个建筑的生产产量加入最终计算中" placement="top">
@@ -177,7 +202,6 @@
               <li class="recipe">配方选择</li>
               <li class="production">工厂类型选择</li>
               <li class="production-model">增产模式选择</li>
-              <li class="plant-model">增产剂等级</li>
             </ul>
           </div>
           <div
@@ -280,7 +304,7 @@
             </div>
             <!-- 增产剂等级 -->
             <div
-              class="production flex"
+              class="production ml-5 flex"
               v-if="!result.factoriesNum.is_mineralized && get_item_recipe_choices(result.key)['additional_mode'] != 0"
             >
               <SelectFactory
@@ -298,8 +322,8 @@
         </div>
       </div>
       <div class="pb-5 pl-20">
-        <h2>冗余产物</h2>
         <template v-if="Object.keys(recipeList.lp_surplus_list).length > 0">
+          <h2>冗余产物</h2>
           <div v-for="building in Object.keys(recipeList.lp_surplus_list)" class="flex items-center">
             <ProductImg width="35" :imgKey="building" class="inline-block" />
             {{ DSP[building].name }} --- {{ recipeList.lp_surplus_list[building] }} 个
@@ -322,6 +346,9 @@
         </template>
 
         <EnReadme class=""></EnReadme>
+        <span>
+          {{ devModel ? productList : '' }}
+        </span>
       </div>
     </div>
     <FormulaSelectionDialog
@@ -331,11 +358,13 @@
       :dateKey="FormulaDialogDateKey"
       :changeRecipeOf="tagRecipeType === 'goal' ? change_recipe_of : fixed_change_recipe_of"
     ></FormulaSelectionDialog>
+    <ConfigDrawer :show="configDrawerShow" :close="changeConfigDrawer"></ConfigDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { isDark, toggleDark } from '@/utils/dark';
+import { reactive, markNonReactive } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import useCounterStore from '@/store/theme';
 import useConfigStore from '@/store/config';
@@ -363,7 +392,95 @@ const click = () => {
   // 点击切换侧边栏状态;
   theme.changeCompact();
 };
+const recipeRef = ref(null);
+const tips = () => {
+  ElMessage({
+    message: '输入后按下回车即可保存',
+    type: 'success',
+  });
+};
+const recipeName = ref('');
+const options = ref(config.recipeList);
 
+const addOption = (event) => {
+  const input = event.target.value;
+  console.log('recipeRef', toRaw(recipeRef));
+  if (input && !options.value.find((option) => option.value === input)) {
+    options.value.push({ value: input, label: input });
+    recipeName.value = input;
+  }
+};
+const saveConfig = () => {
+  console.log('recipeName.value', recipeName.value);
+
+  if (recipeName.value.length > 0) {
+    let rawProductList = toRaw(productList.value);
+    let rawFixedProduction = toRaw(fixedProduction.value);
+    let key = toRaw(recipeName.value);
+    let copyConfig = JSON.parse(JSON.stringify(config));
+    config.recipeListDate[key] = {
+      productList: rawProductList,
+      fixedProduction: rawFixedProduction,
+      config: {
+        scienceResearchSpeed: copyConfig.scienceResearchSpeed,
+        miniCore: copyConfig.miniCore,
+        largeCore: copyConfig.largeCore,
+        largeCoreWorkingSpeed: copyConfig.largeCoreWorkingSpeed,
+        oilWellSpeed: copyConfig.oilWellSpeed,
+        hydrogenCollectionRate: copyConfig.hydrogenCollectionRate,
+        heavyHydrogenCollectionRate: copyConfig.heavyHydrogenCollectionRate,
+        combustibleIceCollectionRate: copyConfig.combustibleIceCollectionRate,
+        shooter: copyConfig.shooter,
+        fractionatingColumnSpeed: copyConfig.fractionatingColumnSpeed,
+        energy_contain_miner: copyConfig.energy_contain_miner,
+        defaultMining: copyConfig.defaultMining,
+        defaultSmelting: copyConfig.defaultSmelting,
+        defaultProduction: copyConfig.defaultProduction,
+        defaultChemical: copyConfig.defaultChemical,
+        defaultCharge: copyConfig.defaultCharge,
+        defaultSpraying: copyConfig.defaultSpraying,
+        defaultInc: copyConfig.defaultInc,
+      },
+    };
+  }
+};
+
+const removeOption = (removeValue) => {
+  options.value = options.value.filter((option) => option.value !== removeValue);
+  config.recipeList = config.recipeList.filter((option) => option.value !== removeValue);
+  if (recipeName.value === removeValue) {
+    recipeName.value = '';
+  }
+  delete config.recipeListDate[removeValue];
+};
+const configDrawerShow = ref(false);
+const changeConfigDrawer = () => {
+  configDrawerShow.value = !configDrawerShow.value;
+};
+const recipeChange = (recipeKey) => {
+  console.log('recipeKey', recipeKey);
+
+  //  保存的所有配方进行切换
+  if (recipeKey == '') {
+    console.log('没有获取到参数, 故此跳出');
+
+    // 置空 选择配方
+    return;
+  }
+  if (Object.keys(config.recipeListDate).length > 0 && recipeKey in config.recipeListDate) {
+    let data = JSON.parse(JSON.stringify(config.recipeListDate[recipeKey]));
+    console.log('toRaw data', data);
+
+    if (data['productList']) {
+      productList.value = toRaw(data['productList']);
+    }
+    if (data['fixedProduction']) {
+      fixedProduction.value = toRaw(data['fixedProduction']);
+    }
+
+    config.setConfig(data['config']);
+  }
+};
 const { t, availableLocales, locale } = useI18n();
 console.log();
 const set_mine = (key) => {
@@ -392,9 +509,32 @@ const openSelect = (key: string) => {
     dialogTitle.value = '选择固定产线';
   }
 };
+const changeUnitTime = (sum) => {
+  let Num = sum;
+  console.log('默认单位配置,', config.productEfficiency);
 
+  switch (config.productEfficiency) {
+    case 's':
+      Num = sum * 60;
+      break;
+    case 'h':
+      Num = sum / 60;
+      break;
+    default:
+      break;
+  }
+  return Num;
+};
 const selectProduct = (selectItem: { key: string; num: number }) => {
   console.log('selectItem', selectItem);
+  recipeName.value = '';
+
+  console.log('===================置空', recipeName.value);
+  // 将保存配方的名字置空
+  // recipeName.value = '';
+
+  // selectItem['num'] = changeUnitTime(selectItem['num']);
+
   if (dialogTitle.value == '选择目标产物') {
     if (selectItem.key in productList.value) {
       productList.value[selectItem.key] += selectItem.num;
@@ -410,7 +550,7 @@ const selectProduct = (selectItem: { key: string; num: number }) => {
         targetName: selectItem.key,
         targetSum: selectItem.num,
         recipe_id: 1,
-        additional_level: 0,
+        additional_level: 4,
         additional_mode: 0,
         architecture: 0,
       };
@@ -423,6 +563,7 @@ const selectProduct = (selectItem: { key: string; num: number }) => {
 };
 
 const closeProduct = () => {
+  // console.error('❌%c1111', 'color: red; font-size: 20px');
   calculate();
   dialogFormVisible.value = false;
 };
@@ -456,6 +597,8 @@ const tagRecipeType = ref('goal');
 const obj = ref(false);
 //点击删除产物
 const delProduct = (type: string, key: string) => {
+  recipeName.value = '';
+
   if (type == 'fixed') {
     // 固定产物
     if (fixedProduction.value[key]) {
@@ -470,6 +613,7 @@ const delProduct = (type: string, key: string) => {
   }
 };
 const cloneSelect = () => {
+  recipeName.value = '';
   productList.value = {};
   fixedProduction.value = {};
 };
@@ -486,10 +630,20 @@ const facilityLabel = (list, key) => {
   return game_data['factory_data'][recipeList.value.recipe_lists[list[key]]['facility']];
 };
 const recipeList = computed(() => {
+  let newData = {};
   console.log('计算的需求信息', productList.value);
+  // for (const key in productList.value) {
+  //   if (Object.prototype.hasOwnProperty.call(productList.value, key)) {
+  //     const element = productList.value[key];
+  //     console.log(element);
+
+  //     // newData[key] = changeUnitTime(element);
+  //   }
+  // }
+  // console.log('newData', newData);
 
   const data = calculate(productList.value);
-  // TODO 这个 console  帮定了依赖项， 如果删除，则丢失，不能相应批量改变
+  // TODO 这个 console  绑定了依赖项， 如果删除，则丢失，不能相应批量改变
   console.log('数据发生改变，重新计算所有依赖', config.isChange);
   console.log('data', data);
   // data.list_data.sost((a) => a.factoriesNum.is_mineralized);

@@ -7,6 +7,8 @@ const config = defineStore({
   persist: true,
   state: () => {
     return {
+      recipeList: [],
+      recipeListDate: {},
       isChange: false, // 检测是否数据发生变化, 发生变化的时候就重新计算公式参数
       scienceResearchSpeed: 1, //科技研究速度
       miniCore: 8, //小型矿机默认覆盖矿脉的数量
@@ -101,12 +103,12 @@ const config = defineStore({
           label: '增产剂MK.Ⅲ',
         },
       ],
-      defaultInc: '0', // 默认增产模式 0 不适用增产剂 1 使用增产， 2 使用加速
+      defaultInc: '0', // 默认增产 0 不适用增产剂 1 使用增产， 2 使用加速
       miningIncOptions: [
         [
           {
             key: '0',
-            name: '该产物不支持使用增产剂',
+            name: '该配方不支持',
           },
         ],
         [
@@ -116,7 +118,7 @@ const config = defineStore({
           },
           {
             key: '1',
-            name: '增产模式',
+            name: '增产',
           },
         ],
         [
@@ -126,17 +128,17 @@ const config = defineStore({
           },
           {
             key: '2',
-            name: '加速模式',
+            name: '加速',
           },
         ],
         [
           {
             key: '1',
-            name: '增产模式',
+            name: '增产',
           },
           {
             key: '2',
-            name: '加速模式',
+            name: '加速',
           },
         ],
         [
@@ -152,12 +154,31 @@ const config = defineStore({
       ],
       IncOptions: [
         {
+          key: '0',
+          name: '不使用',
+        },
+        {
           key: '1',
-          name: '增产模式',
+          name: '增产',
         },
         {
           key: '2',
-          name: '加速模式',
+          name: '加速',
+        },
+      ],
+      productEfficiency: 'm',
+      productEfficiencyOption: [
+        {
+          value: 's',
+          label: '秒',
+        },
+        {
+          value: 'm',
+          label: '分',
+        },
+        {
+          value: 'h',
+          label: '时',
         },
       ],
     };
@@ -166,6 +187,28 @@ const config = defineStore({
   getters: {},
   // pinia 放弃了 mutations 只使用 actions
   actions: {
+    setConfig(config) {
+      console.log('----------------------config', config);
+
+      this.scienceResearchSpeed = config.scienceResearchSpeed;
+      this.miniCore = config.miniCore;
+      this.largeCore = config.largeCore;
+      this.largeCoreWorkingSpeed = config.largeCoreWorkingSpeed;
+      this.oilWellSpeed = config.oilWellSpeed;
+      this.hydrogenCollectionRate = config.hydrogenCollectionRate;
+      this.heavyHydrogenCollectionRate = config.heavyHydrogenCollectionRate;
+      this.combustibleIceCollectionRate = config.combustibleIceCollectionRate;
+      this.shooter = config.shooter;
+      this.fractionatingColumnSpeed = config.fractionatingColumnSpeed;
+      this.energy_contain_miner = config.energy_contain_miner;
+      this.defaultMining = config.defaultMining;
+      this.defaultSmelting = config.defaultSmelting;
+      this.defaultProduction = config.defaultProduction;
+      this.defaultChemical = config.defaultChemical;
+      this.defaultCharge = config.defaultCharge;
+      this.defaultSpraying = config.defaultSpraying;
+      this.defaultInc = config.defaultInc;
+    },
     changeConfig() {
       console.error('      this.isChange', this.isChange);
 
@@ -198,6 +241,10 @@ const config = defineStore({
     change_energy_contain_miner() {
       this.changeConfig();
       this.energy_contain_miner = this.energy_contain_miner ? 0 : 1;
+    },
+    changeProductEfficiency(value) {
+      this.productEfficiency = value;
+      this.isChange = !this.isChange;
     },
   },
 });

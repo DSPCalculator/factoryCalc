@@ -255,10 +255,10 @@ const scheme_data = {
   function changeFractionatingSpeed() {
     scheme_data.fractionating_speed = Number(document.getElementById("分馏塔过氢带速").value);
     if (scheme_data.fractionating_speed > 1800) {
-      game_data.factory_data["分馏设备"][0]["耗能"] = scheme_data.fractionating_speed * 0.0006 - 0.36;
+      game_data.factory_data["分馏设备"][0]["power-ratio"] = scheme_data.fractionating_speed * 0.0006 - 0.36;
     }
     else {
-      game_data.factory_data["分馏设备"][0]["耗能"] = 0.72;
+      game_data.factory_data["分馏设备"][0]["power-ratio"] = 0.72;
     }
   }//更改分馏塔过氢带速
 
@@ -1173,7 +1173,7 @@ function get_item_cost(item) {
     layer_count = stackable_buildings[building_info["name"]];
   }
   cost = Number(cost) + building_count_per_yield * scheme_data.cost_weight["占地"] * building_info["占地"] / layer_count;//计算占地造成的成本=单位产能建筑数*占地成本权重*建筑占地
-  cost = Number(cost) + building_count_per_yield * scheme_data.cost_weight["电力"] * building_info["耗能"] * game_data.proliferate_effect[scheme_data.scheme_for_recipe[recipe_id]["additional_level"]]["power-ratio"];
+  cost = Number(cost) + building_count_per_yield * scheme_data.cost_weight["电力"] * building_info["power-ratio"] * game_data.proliferate_effect[scheme_data.scheme_for_recipe[recipe_id]["additional_level"]]["power-ratio"];
   //计算耗电造成的成本 = 单位产能建筑数 * 耗电成本权重 * 建筑耗电 * 喷涂影响
   cost = Number(cost) + building_count_per_yield * (0 * scheme_data.cost_weight["construction_cost"]["分拣器"] / layer_count + scheme_data.cost_weight["construction_cost"][building_info["name"]]);
   //建筑产生的成本 = 单位产能建筑数*(每个结构中分拣器数量*分拣器成本 + 生产construction_cost 建筑成本)，分拣器成本那块，说是分拣器，但实际上可以是任何一个针对各种配方独立成本的系数
@@ -1323,7 +1323,7 @@ function show_result_dict() {
     game_data.factory_data[""]
     var factory = game_data.recipe_data[recipe_id]["facility"];
     if (factory != "巨星采集" && !(!scheme_data.energy_contain_miner && (factory == "采矿设备" || factory == "抽水设备" || factory == "抽油设备"))) {
-      var e_cost = build_number * game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["耗能"];
+      var e_cost = build_number * game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["power-ratio"];
       if (game_data.factory_data[game_data.recipe_data[recipe_id]["facility"]][scheme_for_recipe["architecture"]]["name"] == "大型采矿机") {
         e_cost = scheme_data.mining_rate["大矿机工作倍率"] * scheme_data.mining_rate["大矿机工作倍率"] * (2.94 - 0.168) + 0.168;
       }
@@ -1331,6 +1331,9 @@ function show_result_dict() {
         e_cost *= game_data.proliferate_effect[scheme_for_recipe["additional_level"]]["power-ratio"];
       }
       energy_cost = Number(energy_cost) + e_cost;
+      if (isNaN(energy_cost)) {
+        console.error("计算数据发生错误,请联系开发者")
+      }
     }
     return build_number;
   }
@@ -1426,7 +1429,9 @@ function show_result_dict() {
       if (natural_production_line[NPId]["additional_level"] != 0 && natural_production_line[NPId]["additional_mode"] != 0) {
         e_cost *= game_data.proliferate_effect[natural_production_line[NPId]["additional_level"]]["power-ratio"];
       }
+
       energy_cost = Number(energy_cost) + e_cost;
+
     }
   }
   var building_str = "";
@@ -1456,6 +1461,7 @@ function init_recipe_list() {
   for (var i = 0; i < game_data.recipe_data.length; i++) {
     recipe_list.push(recipe_to_html(game_data.recipe_data[i]))
   }
+  console.log('recipe_list', recipe_list)
   return recipe_list
 }//初始化配方选取列表
 
@@ -1584,4 +1590,23 @@ export const update_fixed_recipe = (data) => {
 export const del_fixed_recipe = (key) => {
   console.log(natural_production_line);
   natural_production_line = natural_production_line.filter(item => item.targetName !== key)
+}
+
+initConfig()
+
+function initConfig() {
+  console.log('config', config);
+  console.log('config', config.defaultInc);
+  //加载初始化配置
+  // 喷涂点数
+  batchChangeProNum(config.defaultSpraying)
+  batchChangeProMode(config.defaultInc)
+  batchChangeFactoryOf('采矿设备', config.defaultMining);
+  batchChangeFactoryOf('冶炼设备', config.defaultSmelting);
+  batchChangeFactoryOf('production_platform', config.defaultProduction);
+  batchChangeFactoryOf('化工设备', config.defaultChemical);
+  batchChangeFactoryOf('充电设备', config.defaultCharge);
+
+  batchChangeProNum(config.defaultSpraying);
+  batchChangeProMode(config.defaultInc);
 }
